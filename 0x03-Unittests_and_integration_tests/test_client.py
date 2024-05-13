@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-""" A module for testing the utils module"""
+"""A module for testing the utils module"""
 
 import unittest
 from parameterized import parameterized, parameterized_class
