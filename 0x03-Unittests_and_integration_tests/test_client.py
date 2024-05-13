@@ -13,15 +13,17 @@ from typing import Dict
 class TestGithubOrgClient(unittest.TestCase):
     """Tests the GithubOrgClient class"""
 
-    @parameterized.expand([("google",), ("abc",)])
+    @parameterized.expand([('google',), ('abc',)])
     @patch("client.get_json")
-    def test_org(self, org_name: str, mock_get: MagicMock) -> None:
-        """Tests the org method"""
+    def test_org(self, org_name: str, mock_get_json: MagicMock) -> None:
+        '''testing the "GithubOrgClient.org"'''
 
-        client = GithubOrgClient(org_name)
-        expected_argument = client.ORG_URL.format(org=org_name)
-        client.org()
-        mock_get.assert_called_once_with(expected_argument)
+        github_client = GithubOrgClient(org_name)
+        expected_argument = github_client.ORG_URL.format(org=org_name)
+
+        github_client.org()
+
+        mock_get_json.assert_called_once_with(expected_argument)
 
     def test_public_repos_url(self) -> None:
         """Tests the _public_repos_url property"""
