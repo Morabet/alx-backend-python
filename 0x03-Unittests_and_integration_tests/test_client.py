@@ -13,10 +13,7 @@ from typing import Dict
 class TestGithubOrgClient(unittest.TestCase):
     """ Tests the GithubOrgClient class"""
 
-    @parameterized.expand([
-        ("google",),
-        ("abc",)
-    ])
+    @parameterized.expand([("google",), ("abc",)])
     @patch("client.get_json")
     def test_org(self, org_name: str, mock_get: MagicMock) -> None:
         """ Tests the org method"""
