@@ -38,51 +38,28 @@ class TestGithubOrgClient(unittest.TestCase):
     @patch("client.get_json")
     def test_public_repos(self, mock_get: MagicMock) -> None:
         """ Tests the public_repos method"""
-        test_payload = {
-            "repos_url": "https://api.github.com/orgs/google/repos",
-            'repos': [
-                {
-                    "id": 7697149,
-                    "node_id": "MDEwOlJlcG9zaXRvcnk3Njk3MTQ5",
-                    "name": "episodes.dart",
-                    "full_name": "google/episodes.dart",
-                    "private": False, },
-                {
-                    "id": 7776515,
-                    "node_id": "MDEwOlJlcG9zaXRvcnk3Nzc2NTE1",
-                    "name": "cpp-netlib",
-                    "full_name": "google/cpp-netlib",
-                    "private": False,
-                }
-            ]
-        }
 
-        mock_get.return_value = test_payload['repos']
+        mock_get.return_value = TEST_PAYLOAD[0][1]
         with patch(
             "client.GithubOrgClient._public_repos_url",
             new_callable=PropertyMock
         ) as mock_repos_url:
 
-            mock_repos_url.return_value = test_payload['repos_url']
+            mock_repos_url.return_value = TEST_PAYLOAD[0][0]['repos_url']
             client = GithubOrgClient("google")
-            self.assertEqual(client.public_repos(), [
-                             "episodes.dart", "cpp-netlib"])
+            self.assertEqual(client.public_repos(), TEST_PAYLOAD[0][2])
             mock_repos_url.assert_called_once()
             mock_get.assert_called_once()
 
     @parameterized.expand([
         ({"license": {"key": "my_license"}}, "my_license", True),
-        ({"license": {"key": "other_license"}},
-         "my_license", False)
+        ({"license": {"key": "other_license"}}, "my_license", False)
     ])
-    def test_has_license(
-        self, repo: Dict,
-        license_key: str, expected_value: bool
-    ) -> None:
+    def test_has_license(self, repo: Dict, key: str, expected: bool) -> None:
         """ Tests the has_license method"""
         client = GithubOrgClient("google")
-        client_has_licence = client.has_license(repo, license_key)
-        self.assertEqual(client_has_licence, expected_value)
+        client_has_licence = client.has_license(repo, key)
+        self.assertEqual(client_has_licence, expected)
 
 
 @parameterized_class([
@@ -104,7 +81,8 @@ class TestIntegrationGithubOrgClient(unittest.TestCase):
             'https://api.github.com/orgs/google/repos': cls.repos_payload,
         }
 
-        def get_payload(url):
+        def get_payload(url: str):
+            """ mocking the request.get"""
             if url in route_payload:
                 return Mock(**{'json.return_value': route_payload[url]})
             return HTTPError
